@@ -120,4 +120,3 @@ layer VS Code renders on top of the real buffer). This is why `git status`
 / `git diff` will always show zero changes from this extension — there is
 no code path in this project capable of writing to your files. See
 `ARCHITECTURE.md` §1 and §6 for the mechanism.
-

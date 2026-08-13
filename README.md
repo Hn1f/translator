@@ -1,15 +1,35 @@
 # AI Code Identifier Translator
 
-Read source code that uses non-English identifiers (Chinese, Japanese,
-Korean, Arabic, Russian, ...) displayed as English inside VS Code — **the
-file on disk is never modified.** Translation runs entirely locally via
-Ollama; nothing is sent to the cloud.
+**Stop context-switching just to read a variable name.**
 
-> This is Phase 1 (read-side, decoration-based display) of a two-phase plan.
-> See `ARCHITECTURE.md` for the full design and `KNOWN_LIMITATIONS.md` for
-> what's deliberately not implemented yet (in particular: no invisible
-> write-back / editing support in this version — see §8 of the architecture
-> doc for why and what's planned instead).
+If you've ever opened a file and hit a wall of `用户数量`, `مدير_الإعدادات`,
+or `текущаяПопытка`, you know the drill — alt-tab to a translator, copy the
+identifier, paste, alt-tab back, repeat for every symbol in the file. This
+extension does that step for you, live, inline, as you scroll.
+
+🌐 **Chinese, Japanese, Korean, Arabic, and Russian identifiers** are shown
+as English right in the editor — `机器人控制器` reads as `RobotController`,
+`当前坐标X` reads as `currentCoordinateX`.
+
+🔒 **Your file never changes.** Not one byte. Translation is a pure visual
+overlay (VS Code decorations) on top of the real text — `git diff` stays
+empty, and moving your cursor onto a translated name instantly reveals the
+original underneath.
+
+🖥️ **100% local.** Every translation runs through [Ollama](https://ollama.com)
+on your machine. No API key, no cloud call, no code ever leaves your
+computer.
+
+⚡ **Fast after the first pass.** Translations are cached per-repository, so
+reopening a file you've already scanned is instant.
+
+---
+
+> **Status:** this is Phase 1 — read-side, decoration-based display. Editing
+> support (typing the English name and having it write back the original
+> script) is on the roadmap but not yet implemented; see `ARCHITECTURE.md`
+> §8 for the design and why it's a separate phase, and `KNOWN_LIMITATIONS.md`
+> for the current honest list of rough edges.
 
 ## Requirements
 
@@ -100,74 +120,3 @@ layer VS Code renders on top of the real buffer). This is why `git status`
 / `git diff` will always show zero changes from this extension — there is
 no code path in this project capable of writing to your files. See
 `ARCHITECTURE.md` §1 and §6 for the mechanism.
-
-## Publishing to the VS Code Marketplace (free)
-
-1. **Create a publisher.** Go to https://marketplace.visualstudio.com/manage
-   and create a publisher ID (this becomes the `publisher` field in
-   `package.json` — replace `REPLACE_WITH_YOUR_MARKETPLACE_PUBLISHER_ID`
-   with it).
-2. **Get an Azure DevOps Personal Access Token (PAT).** Publishing is done
-   through Azure DevOps, not directly through the Marketplace site.
-   - Go to https://dev.azure.com, sign in with the same Microsoft account.
-   - User settings → Personal access tokens → New Token.
-   - Scope: **Marketplace → Manage**. Copy the token somewhere safe — it's
-     only shown once.
-3. **Fill in the remaining placeholders** in `package.json` and `LICENSE`:
-   `repository.url`, and the copyright name in `LICENSE`. Also replace the
-   Gumroad placeholders in `src/licensing/LicenseManager.ts` (see below) if
-   you're using the licensing feature.
-4. **Package and publish:**
-   ```bash
-   npm install -g @vscode/vsce
-   vsce login <your-publisher-id>   # paste the PAT when prompted
-   vsce publish                     # bumps nothing by default; or:
-   vsce publish patch               # bumps version and publishes in one step
-   ```
-   `vsce publish` runs `vscode:prepublish` (which compiles TypeScript)
-   automatically before packaging.
-5. An icon is optional but recommended — add a 128×128 PNG and reference it
-   via `"icon": "images/icon.png"` in `package.json`. Without one, the
-   Marketplace shows a generic default icon, which is fine for a first
-   release.
-
-The extension itself stays 100% free and fully functional either way —
-nothing in this repo gates a feature behind a license. See below for what
-the optional Pro-license nudge actually does.
-
-## Optional: Pro license nudge (honor-system, not a paywall)
-
-VS Code's Marketplace doesn't support charging for extensions directly, so
-this project uses the common workaround: the extension is entirely free and
-fully functional for everyone, and professional/commercial users are
-occasionally invited (not required) to buy a Pro license to support
-development. **No feature is ever gated** — this is a goodwill reminder,
-not a technical restriction.
-
-How it works (`src/licensing/LicenseManager.ts`):
-- On first activation, a one-time, dismissible prompt asks whether usage is
-  personal or professional. The answer is stored locally
-  (`context.globalState`), never sent anywhere.
-- If "professional" and no valid license key is stored, a reminder appears
-  at most once every 2 weeks, offering to open the purchase page or enter
-  an existing key.
-- License keys are verified directly against Gumroad's public License
-  Verification API (`https://api.gumroad.com/v2/licenses/verify`) — no
-  backend server required. The key is stored in VS Code's encrypted
-  `SecretStorage`, not in plaintext settings.
-
-To enable this:
-1. Create a product on https://gumroad.com (e.g. "AI Identifier Translator
-   Pro License").
-2. In `src/licensing/LicenseManager.ts`, replace:
-   - `GUMROAD_PRODUCT_PERMALINK` with your product's permalink (the last
-     segment of its Gumroad URL).
-   - `PURCHASE_URL` with the full purchase page URL.
-3. Recompile (`npm run compile`) and republish.
-
-If you'd rather not include this at all, delete
-`src/licensing/LicenseManager.ts`, remove its import and the
-`enterLicenseKey` command registration plus the `runStartupCheck()` call in
-`src/extension.ts`, and drop the corresponding command entry from
-`package.json`.
-

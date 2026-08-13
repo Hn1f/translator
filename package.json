@@ -2,7 +2,7 @@
   "name": "ai-identifier-translator",
   "displayName": "AI Code Identifier Translator",
   "description": "Read source code with non-English identifiers displayed in English, without ever modifying the file on disk. Local LLM only, no cloud calls.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "Hn1f",
   "license": "MIT",
   "repository": {
@@ -22,7 +22,10 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other", "Programming Languages"],
+  "categories": [
+    "Other",
+    "Programming Languages"
+  ],
   "activationEvents": [
     "onStartupFinished"
   ],

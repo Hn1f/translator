@@ -1,0 +1,139 @@
+{
+  "name": "ai-identifier-translator",
+  "displayName": "AI Code Identifier Translator",
+  "description": "Read source code with non-English identifiers displayed in English, without ever modifying the file on disk. Local LLM only, no cloud calls.",
+  "version": "0.1.0",
+  "publisher": "Hn1f",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "REPLACE_WITH_YOUR_GIT_REPO_URL"
+  },
+  "keywords": [
+    "translation",
+    "i18n",
+    "identifiers",
+    "chinese",
+    "japanese",
+    "arabic",
+    "ollama",
+    "local llm"
+  ],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other", "Programming Languages"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiIdentifierTranslator.toggle",
+        "title": "AI Identifier Translator: Toggle Translation"
+      },
+      {
+        "command": "aiIdentifierTranslator.translateFile",
+        "title": "AI Identifier Translator: Translate Active File Now"
+      },
+      {
+        "command": "aiIdentifierTranslator.clearCache",
+        "title": "AI Identifier Translator: Clear Cache for This Repository"
+      },
+      {
+        "command": "aiIdentifierTranslator.revealOriginal",
+        "title": "AI Identifier Translator: Show Original Identifier Under Cursor"
+      },
+      {
+        "command": "aiIdentifierTranslator.enterLicenseKey",
+        "title": "AI Identifier Translator: Enter Pro License Key"
+      }
+    ],
+    "configuration": {
+      "title": "AI Identifier Translator",
+      "properties": {
+        "aiIdentifierTranslator.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable virtual identifier translation."
+        },
+        "aiIdentifierTranslator.targetLanguage": {
+          "type": "string",
+          "default": "en",
+          "description": "Display language for translated identifiers."
+        },
+        "aiIdentifierTranslator.model": {
+          "type": "string",
+          "default": "qwen2.5:1.5b-instruct",
+          "description": "Ollama model tag used for identifier translation."
+        },
+        "aiIdentifierTranslator.ollamaEndpoint": {
+          "type": "string",
+          "default": "http://127.0.0.1:11434",
+          "description": "Local Ollama server endpoint. Never sent over the network beyond localhost."
+        },
+        "aiIdentifierTranslator.temperature": {
+          "type": "number",
+          "default": 0.1,
+          "description": "Sampling temperature for the translation model."
+        },
+        "aiIdentifierTranslator.maxContextTokens": {
+          "type": "number",
+          "default": 2048,
+          "description": "Maximum context window used per translation request."
+        },
+        "aiIdentifierTranslator.automaticTranslation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically translate visible identifiers as you scroll/open files. Disable to translate only on manual command."
+        },
+        "aiIdentifierTranslator.maxConcurrentTranslations": {
+          "type": "number",
+          "default": 2,
+          "description": "Maximum concurrent requests to the local Ollama server."
+        },
+        "aiIdentifierTranslator.cacheLocation": {
+          "type": "string",
+          "default": "",
+          "description": "Directory for the per-repository SQLite cache. Empty = use VS Code global storage path."
+        },
+        "aiIdentifierTranslator.decorationColor": {
+          "type": "string",
+          "default": "#6A9955",
+          "description": "Color used to render translated (virtual) identifiers, to distinguish them from real source text."
+        },
+        "aiIdentifierTranslator.lowConfidenceColor": {
+          "type": "string",
+          "default": "#CC6666",
+          "description": "Color used for fallback/low-confidence translations (e.g. transliteration fallback)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "node ./out/test/runTest.js",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@types/mocha": "^10.0.6",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@types/node-fetch": "^2.6.11",
+    "@types/sql.js": "^1.4.9",
+    "eslint": "^8.56.0",
+    "mocha": "^10.3.0",
+    "typescript": "^5.3.3",
+    "@vscode/test-electron": "^2.3.9",
+    "glob": "^10.3.10"
+  },
+  "dependencies": {
+    "sql.js": "^1.11.0",
+    "node-fetch": "^2.7.0"
+  }
+}
